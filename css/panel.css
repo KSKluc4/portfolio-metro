@@ -1,0 +1,576 @@
+/* ===================================================================
+ *  PAINEL DA ESTAÇÃO — placa no topo, painel de embarque embaixo
+ * -------------------------------------------------------------------
+ *  Computador: entra pela direita, por cima do mapa.
+ *  Celular: gaveta que sobe de baixo (e desce arrastando).
+ * =================================================================== */
+
+.panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, 92vw);
+  border-left: 1.5px solid var(--rule-strong);
+  background: var(--ground-raised);
+  translate: 100% 0;
+  visibility: hidden;
+  transition: translate 0.5s var(--ease-out), visibility 0s linear 0.5s;
+}
+
+.panel.is-open {
+  translate: 0 0;
+  visibility: visible;
+  transition: translate 0.5s var(--ease-out);
+}
+
+.panel__grip {
+  display: none;
+}
+
+.panel__close {
+  position: absolute;
+  top: 16px;
+  right: 14px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1.5px solid rgb(255 255 255 / 0.4);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--plate-ink);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.panel__close:hover {
+  border-color: #fff;
+  background: rgb(255 255 255 / 0.1);
+}
+
+.panel__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 28px;
+}
+
+/* ---------- a placa ---------- */
+
+.sign {
+  position: relative;
+  padding: 26px 64px 20px 22px;
+  background: var(--plate);
+  color: var(--plate-ink);
+}
+
+/* Faixas no topo: uma por linha que passa na estação */
+.sign__bands {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  height: 6px;
+}
+
+.sign__bands span {
+  flex: 1;
+  background: var(--c);
+}
+
+.sign__title {
+  margin: 0;
+  font: 800 31px/1.04 var(--font-sign);
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+  outline: none;
+}
+
+.sign__lines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font: 700 13.5px/1 var(--font-sign);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--plate-ink-2);
+}
+
+.sign__lines li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.sign__kind {
+  padding: 3px 7px;
+  border: 1.5px solid rgb(255 255 255 / 0.5);
+  border-radius: 4px;
+  color: var(--plate-ink);
+}
+
+.sign__sub {
+  margin: 10px 0 0;
+  font: 700 13px/1.2 var(--font-sign);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--plate-ink-2);
+}
+
+.sign__new {
+  display: inline-block;
+  margin: 14px 0 0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--signal);
+  color: #fff;
+  font: 800 11px/1.2 var(--font-text);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+/* ---------- conteúdo ---------- */
+
+.desc {
+  max-width: 62ch;
+  margin: 20px 22px 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.desc--empty {
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.shot {
+  margin: 20px 22px 0;
+  overflow: hidden;
+  border: 1.5px solid var(--rule);
+  border-radius: 10px;
+}
+
+.shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.block {
+  margin: 24px 22px 0;
+}
+
+.block__title {
+  margin: 0 0 10px;
+  font: 700 12px/1 var(--font-sign);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* ---------- painel de embarque (palhetas) ---------- */
+
+.board {
+  margin: 22px 22px 0;
+  padding: 14px 14px 13px;
+  border-radius: 10px;
+  background: var(--board);
+  color: var(--board-ink);
+}
+
+.board__rows {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+}
+
+.board__row {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.board__row dt {
+  font: 700 11px/1 var(--font-sign);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--board-key);
+}
+
+.board__row dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  min-width: 0;
+  margin: 0;
+}
+
+.board__icon {
+  width: 17px;
+  height: 17px;
+  color: var(--board-accent);
+}
+
+.board__note {
+  font: 600 12px/1 var(--font-sign);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--board-key);
+}
+
+.flap {
+  display: flex;
+  gap: 2px;
+}
+
+.flap__tile {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 17px;
+  height: 26px;
+  border-radius: 3px;
+  background: linear-gradient(var(--board-tile) 50%, color-mix(in srgb, var(--board-tile) 82%, black) 50%);
+  font: 700 16px/1 var(--font-sign);
+  font-variant-numeric: tabular-nums;
+  color: var(--board-ink);
+}
+
+/* A dobra no meio da palheta */
+.flap__tile::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - 0.5px);
+  height: 1px;
+  background: var(--board-seam);
+}
+
+.flap__tile.is-spinning {
+  color: color-mix(in srgb, var(--board-ink) 65%, transparent);
+}
+
+.flap__gap {
+  width: 6px;
+}
+
+/* ---------- linguagens e tecnologias ---------- */
+
+.langbar {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.langbar span {
+  background: var(--c);
+}
+
+.langs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 18px;
+  margin: 11px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.langs li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13.5px;
+}
+
+.langs__dot {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--c);
+}
+
+.langs__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.langs__pct {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips li {
+  padding: 5px 10px;
+  border: 1.5px solid var(--rule);
+  border-radius: 6px;
+  font: 700 14px/1.2 var(--font-sign);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- botões ---------- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 26px 22px 0;
+}
+
+.btn {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1.5px solid var(--ink);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font: 800 15px/1 var(--font-sign);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, translate 0.2s var(--ease-out);
+}
+
+.btn:hover {
+  translate: 0 -1px;
+}
+
+.btn--code:hover {
+  background: var(--ink);
+  color: var(--ground);
+}
+
+/* EMBARCAR: na cor da linha principal da estação */
+.btn--board {
+  border-color: var(--c);
+  background: var(--c);
+  color: var(--on);
+}
+
+.btn--board:hover {
+  background: color-mix(in srgb, var(--c) 86%, black);
+}
+
+/* ---------- estação anterior / próxima ---------- */
+
+.hop {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 26px 22px 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.hop__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 9px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font: 700 14.5px/1.2 var(--font-sign);
+  text-align: left;
+  cursor: pointer;
+}
+
+.hop__btn small {
+  display: block;
+  margin-top: 4px;
+  font: 700 11px/1 var(--font-sign);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.hop__btn--next {
+  grid-column: 2;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.hop__btn:hover {
+  background: var(--ground-sunk);
+}
+
+/* ---------- Estação Central: próximas partidas ---------- */
+
+.board--departures {
+  padding: 12px 8px 6px;
+}
+
+.board__title {
+  margin: 2px 8px 8px;
+  font: 700 12px/1 var(--font-sign);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--board-accent);
+}
+
+.departures {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.departure {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 8px;
+  border: 0;
+  border-top: 1px solid rgb(255 255 255 / 0.09);
+  border-radius: 0;
+  background: transparent;
+  color: var(--board-ink);
+  font: 700 15px/1.2 var(--font-sign);
+  text-align: left;
+  cursor: pointer;
+}
+
+.departure:hover {
+  background: rgb(255 255 255 / 0.06);
+}
+
+.departure__lines {
+  display: flex;
+  gap: 3px;
+}
+
+.departure__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.departure__when {
+  font: 700 11.5px/1 var(--font-sign);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--board-key);
+}
+
+.departure__when b {
+  color: var(--board-accent);
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+.hub-note {
+  max-width: 62ch;
+  margin: 16px 22px 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* ---------- celular: gaveta de baixo para cima ---------- */
+
+@media (max-width: 720px) {
+  .panel {
+    top: auto;
+    left: 0;
+    width: auto;
+    max-height: min(72dvh, 640px);
+    border-left: 0;
+    border-radius: 18px 18px 0 0;
+    box-shadow: var(--lift);
+    translate: 0 calc(100% + 24px);
+    transition: translate 0.5s var(--ease-out), visibility 0s linear 0.5s;
+  }
+
+  .panel.is-open {
+    translate: 0 var(--drag, 0px);
+    transition: translate 0.5s var(--ease-out);
+  }
+
+  .panel.is-dragging {
+    transition: none;
+  }
+
+  .panel__grip {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 96px;
+    height: 24px;
+    translate: -50% 0;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .panel__grip span {
+    width: 42px;
+    height: 5px;
+    border-radius: 3px;
+    background: rgb(255 255 255 / 0.55);
+  }
+
+  .panel__body {
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    border-radius: 18px 18px 0 0;
+  }
+
+  .sign {
+    padding: 32px 60px 18px 18px;
+    touch-action: none;
+  }
+
+  .sign__title {
+    font-size: 27px;
+  }
+
+  .desc,
+  .board,
+  .block,
+  .actions,
+  .hop,
+  .hub-note,
+  .shot {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+
+  .panel__close {
+    top: 18px;
+  }
+}

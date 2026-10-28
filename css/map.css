@@ -1,0 +1,273 @@
+/* ===================================================================
+ *  MAPA — linhas, estações, nomes e o trem (tudo dentro do SVG)
+ * -------------------------------------------------------------------
+ *  Cada linha, estação e o trem recebem --c (a cor da linha) no HTML.
+ *  No modo noturno a cor é clareada para continuar visível no escuro.
+ * =================================================================== */
+
+.line,
+.station,
+.train {
+  --stroke: var(--c, var(--ink));
+}
+
+:root[data-theme='dark'] .line,
+:root[data-theme='dark'] .station,
+:root[data-theme='dark'] .train {
+  --stroke: color-mix(in oklab, var(--c, var(--ink)) 78%, white);
+}
+
+/* ---------- rio (as linhas passam por cima, como pontes) ---------- */
+
+.river {
+  fill: none;
+  stroke: var(--river);
+  stroke-linejoin: round;
+}
+
+/* ---------- linhas ---------- */
+
+.line {
+  transition: opacity 0.25s;
+}
+
+/* Faixa da cor do fundo: abre o vão onde outra linha passa por cima */
+.line__casing {
+  fill: none;
+  stroke: var(--ground);
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.line__track {
+  fill: none;
+  stroke: var(--stroke);
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Em obras: tracejado na cor da linha */
+.line__works {
+  fill: none;
+  stroke: var(--stroke);
+  stroke-width: 7;
+  stroke-dasharray: 7 6;
+}
+
+.line__terminus circle {
+  fill: var(--stroke);
+}
+
+.line__terminus text {
+  fill: var(--on);
+  font: 800 12.5px var(--font-sign);
+  text-anchor: middle;
+}
+
+:root[data-theme='dark'] .line__terminus text {
+  fill: #0b1120;
+}
+
+/* ---------- estações ---------- */
+
+.station {
+  cursor: pointer;
+  outline: none;
+  transition: opacity 0.25s;
+}
+
+.station__hit {
+  fill: transparent;
+}
+
+.station__dot {
+  fill: var(--station);
+  stroke: var(--stroke);
+  stroke-width: 4.5;
+  transition: scale 0.25s var(--ease-out), stroke-width 0.25s;
+}
+
+.station--interchange .station__dot {
+  stroke: var(--ink);
+  stroke-width: 5;
+}
+
+.station--hub .station__dot {
+  stroke: var(--ink);
+  stroke-width: 6;
+}
+
+.station__core {
+  fill: var(--ink);
+  pointer-events: none;
+}
+
+.station:hover .station__dot,
+.station:focus-visible .station__dot {
+  scale: 1.18;
+}
+
+.station:focus-visible .station__hit {
+  fill: none;
+  stroke: var(--focus);
+  stroke-width: 2.5;
+  stroke-dasharray: 5 4;
+}
+
+/* Estação escolhida: anel justo em volta (sem encostar no nome) */
+.station.is-selected .station__pulse {
+  opacity: 1;
+  scale: 1.4;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.station.is-selected .station__dot {
+  stroke-width: 6.5;
+}
+
+/* Parada do trem: um anel que se espalha */
+.station__pulse {
+  fill: none;
+  stroke: var(--stroke);
+  stroke-width: 3;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.station--interchange .station__pulse,
+.station--hub .station__pulse {
+  stroke: var(--ink);
+}
+
+.station.is-boarding .station__pulse {
+  animation: boarding 1.3s var(--ease-out);
+}
+
+@keyframes boarding {
+  from {
+    opacity: 0.75;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 2.6;
+  }
+}
+
+/* ---------- nomes ---------- */
+
+.label {
+  cursor: pointer;
+  transition: opacity 0.25s;
+}
+
+.label__text {
+  font: 700 15px 'Roboto Condensed', 'Arial Narrow', sans-serif;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--ground);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.label:hover .label__text {
+  fill: var(--focus);
+}
+
+/* Selos: "Nova estação" (piscando) e "Você está aqui" */
+.tag text {
+  font: 800 9.5px Inter, system-ui, sans-serif;
+  letter-spacing: 0.8px;
+  text-anchor: middle;
+}
+
+.tag--new rect {
+  fill: var(--signal);
+}
+
+.tag--new text {
+  fill: #fff;
+}
+
+.tag--new {
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+.tag--here rect {
+  fill: var(--signal);
+}
+
+.tag--here text {
+  fill: #fff;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- entrada: as linhas se desenham a partir da Central ---------- */
+
+.map__svg.is-intro .line__track,
+.map__svg.is-intro .line__casing {
+  stroke-dasharray: 1 1;
+  animation: draw 0.9s var(--ease-out) both;
+  animation-delay: calc(min(var(--i, 0), 8) * 160ms);
+}
+
+.map__svg.is-intro .line__works,
+.map__svg.is-intro .line__terminus,
+.map__svg.is-intro .station,
+.map__svg.is-intro .label {
+  animation: arrive 0.45s var(--ease-out) both;
+  animation-delay: calc(350ms + min(var(--i, 0), 14) * 120ms);
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- destaque de uma linha pela legenda ---------- */
+
+.map__svg.has-focus-line .line:not(.is-focus) {
+  opacity: 0.12;
+}
+
+.map__svg.has-focus-line .station:not(.is-focus),
+.map__svg.has-focus-line .label:not(.is-focus) {
+  opacity: 0.22;
+}
+
+/* ---------- o trem ---------- */
+
+.train {
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.28));
+}
+
+.train__body {
+  fill: var(--ink);
+}
+
+.train__stripe {
+  fill: var(--stroke);
+}
+
+.train__window {
+  fill: var(--station);
+}
